@@ -1,0 +1,123 @@
+Approach: Largest Rectangle in Histogram
+
+The main idea is to find, for each bar, the maximum width for which that bar can be the shortest bar.
+
+For every heights[i], we need two things:
+
+Left boundary → first bar on the left that is smaller than heights[i]
+Right boundary → first bar on the right that is smaller than heights[i]
+
+Then:
+
+$$ \text{width} = right[i] - left[i] - 1 $$
+
+and
+
+$$ \text{area} = heights[i] \times width $$
+Step 1: Find smaller element on the left
+
+You use a monotonic increasing stack.
+
+for i in range(n):
+    while stack and heights[stack[-1]] >= heights[i]:
+        stack.pop()
+
+    left[i] = stack[-1] if stack else -1
+    stack.append(i)
+
+The stack stores indices, not heights.
+
+For example:
+
+heights = [2, 1, 5, 6, 2, 3]
+
+For 5, the first smaller element on the left is 1.
+
+So:
+
+left[2] = 1
+Step 2: Find smaller element on the right
+
+Same concept, but scan from right to left.
+
+for i in range(n - 1, -1, -1):
+    while stack and heights[stack[-1]] >= heights[i]:
+        stack.pop()
+
+    right[i] = stack[-1] if stack else n
+    stack.append(i)
+
+For 5, the first smaller element on the right is 2.
+
+So:
+
+right[2] = 4
+Step 3: Calculate width
+
+For each bar:
+
+width = right[i] - left[i] - 1
+
+For the 5:
+
+left  = 1
+right = 4
+
+width = 4 - 1 - 1
+      = 2
+
+So the rectangle containing height 5 is:
+
+5  5
+
+Area:
+
+5 × 2 = 10
+Step 4: Find maximum area
+max_area = max(max_area, heights[i] * width)
+
+For:
+
+[2, 1, 5, 6, 2, 3]
+
+the answer is:
+
+10
+
+because the rectangle formed by 5 and 6 has height 5 and width 2.
+
+Why use a stack?
+
+Without a stack, finding the nearest smaller element for every bar can take O(n²).
+
+The monotonic stack lets us find these boundaries in O(n).
+
+Complexity
+Time: O(n)
+Space: O(n)
+
+Code: 
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        n = len(heights)
+        left, right = [-1]*n, [n]*n
+        stack = []
+        for i in range(n):
+            while stack and heights[stack[-1]] >= heights[i]:
+                stack.pop()
+            left[i] = stack[-1] if stack else -1
+            stack.append(i)
+
+        stack.clear()
+        for i in range(n-1, -1, -1):
+            while stack and heights[stack[-1]] >= heights[i]:
+                stack.pop()
+            right[i] = stack[-1] if stack else n
+            stack.append(i)
+
+        max_area = 0
+        for i in range(n):
+            width = right[i] - left[i] - 1
+            max_area = max(max_area, heights[i] * width)
+
+        return max_area
