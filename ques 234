@@ -1,0 +1,140 @@
+Code:
+class Solution:
+    def isPalindrome(self, head: Optional[ListNode]) -> bool:
+        arr = []
+
+        while head:
+            arr.append(head.val)
+            head = head.next
+        
+        left = 0
+        right = len(arr) - 1
+
+        while left < right:
+            if arr[left] != arr[right]:
+                return False
+            left += 1
+            right -= 1
+        
+        return True
+
+
+Approach: Store Values in an Array + Two Pointers
+
+The goal is to check whether the linked list reads the same from left to right and right to left.
+
+For example:
+
+1 → 2 → 2 → 1
+
+is a palindrome.
+
+But:
+
+1 → 2 → 3
+
+is not.
+
+Step 1: Store linked-list values in an array
+arr = []
+
+while head:
+    arr.append(head.val)
+    head = head.next
+
+Suppose the linked list is:
+
+1 → 2 → 3 → 2 → 1
+
+After the loop:
+
+arr = [1, 2, 3, 2, 1]
+
+Now the problem becomes much easier because we can access elements from both ends.
+
+Step 2: Create two pointers
+left = 0
+right = len(arr) - 1
+
+Initially:
+
+[1, 2, 3, 2, 1]
+ ↑           ↑
+left       right
+
+left starts at the beginning and right starts at the end.
+
+Step 3: Compare both sides
+while left < right:
+    if arr[left] != arr[right]:
+        return False
+
+For our example:
+
+1 == 1  ✓
+2 == 2  ✓
+3 == 3  ✓
+
+If any pair is different, immediately return False.
+
+For example:
+
+[1, 2, 3, 4]
+ ↑        ↑
+
+1 != 4
+
+So:
+
+return False
+Step 4: Move both pointers toward the center
+left += 1
+right -= 1
+
+So:
+
+[1, 2, 3, 2, 1]
+ ↑           ↑
+left       right
+
+   ↓       ↓
+
+[1, 2, 3, 2, 1]
+    ↑     ↑
+
+      ↓ ↓
+
+[1, 2, 3, 2, 1]
+       ↑
+
+Once left >= right, we've checked all necessary pairs.
+
+Then:
+
+return True
+Overall flow
+Linked List
+    ↓
+1 → 2 → 3 → 2 → 1
+    ↓
+Convert to array
+    ↓
+[1, 2, 3, 2, 1]
+    ↓
+Compare first ↔ last
+    ↓
+Compare second ↔ second-last
+    ↓
+Continue toward center
+    ↓
+All equal?
+  /       \
+Yes       No
+ ↓         ↓
+True      False
+Complexity
+
+If n is the number of nodes:
+
+Time: O(n)
+Space: O(n) because we store all node values in arr.
