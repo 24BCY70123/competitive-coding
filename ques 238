@@ -1,0 +1,497 @@
+Approach: Implement Queue Using Two Stacks
+
+A Queue follows FIFO:
+
+First In, First Out
+
+A Stack follows LIFO:
+
+Last In, First Out
+
+So the challenge is to use two stacks to make a stack behave like a queue.
+
+Your two stacks are:
+
+self.in_stk = []
+self.out_stk = []
+
+Think of them as:
+
+in_stk → where new elements enter
+out_stk → where elements leave
+1. push(x)
+def push(self, x):
+    self.in_stk.append(x)
+
+Simply add the element to in_stk.
+
+For:
+
+push(1)
+push(2)
+push(3)
+
+we get:
+
+in_stk = [1, 2, 3]
+out_stk = []
+2. peek()
+
+This is the most important part.
+
+def peek(self):
+    if not self.out_stk:
+        while self.in_stk:
+            self.out_stk.append(self.in_stk.pop())
+
+    return self.out_stk[-1]
+
+Suppose:
+
+in_stk = [1, 2, 3]
+out_stk = []
+
+We transfer everything from in_stk to out_stk:
+
+in_stk = []
+out_stk = [3, 2, 1]
+
+Because stacks are LIFO, the order gets reversed.
+
+Now:
+
+out_stk[-1] = 1
+
+So 1 is at the front, exactly like a queue.
+
+Queue order:
+1 → 2 → 3
+↑
+front
+3. pop()
+def pop(self):
+    self.peek()
+    return self.out_stk.pop()
+
+First:
+
+self.peek()
+
+makes sure out_stk has elements in the correct order.
+
+Then:
+
+self.out_stk.pop()
+
+removes the front element.
+
+Example:
+
+out_stk = [3, 2, 1]
+
+pop() removes:
+
+1
+
+Leaving:
+
+out_stk = [3, 2]
+4. Why don't we transfer every time?
+
+This is an important optimization.
+
+Suppose:
+
+in_stk = [4, 5]
+out_stk = [3, 2, 1]
+
+If we call pop(), we don't move 4,5 yet.
+
+We simply pop from:
+
+out_stk
+
+So:
+
+1 → removed
+2 → next
+3 → next
+
+Only when out_stk becomes empty do we transfer the elements from in_stk.
+
+This gives the solution amortized O(1) time per operation.
+
+5. empty()
+def empty(self):
+    return not self.in_stk and not self.out_stk
+
+The queue is empty only when both stacks are empty.
+
+For example:
+
+in_stk  = []
+out_stk = []
+
+returns:
+
+True
+
+But:
+
+in_stk  = [5]
+out_stk = []
+
+returns:
+
+False
+Overall example
+push(1)
+push(2)
+push(3)
+
+Initially:
+
+in_stk  = [1, 2, 3]
+out_stk = []
+
+Call:
+
+peek()
+
+Transfer:
+
+in_stk  = []
+out_stk = [3, 2, 1]
+
+Front:
+
+1
+
+Call:
+
+pop()
+
+Result:
+
+1
+
+Now:
+
+out_stk = [3, 2]
+
+Next pop():
+
+2
+
+Next:
+
+3
+
+So we successfully achieved:
+
+Queue: 1 → 2 → 3
+       ↑
+     First Out
+Interview explanation
+
+I use two stacks. The input stack stores newly pushed elements. When I need to access the front of the queue and the output stack is empty, I transfer all elements from the input stack to the output stack, which reverses their order. This makes the oldest element available at the top of the output stack.
+
+Push: O(1)
+Pop: O(1) amortized
+Peek: O(1) amortized
+Space: O(n)
+
+class Solution:
+    def isPalindrome(self, head: Optional[ListNode]) -> bool:
+        arr = []
+
+        while head:
+            arr.append(head.val)
+            head = head.next
+        
+        left = 0
+        right = len(arr) - 1
+
+        while left < right:
+            if arr[left] != arr[right]:
+                return False
+            left += 1
+            right -= 1
+        
+        return True
+Approach: Store Values in an Array + Two Pointers
+
+The goal is to check whether the linked list reads the same from left to right and right to left.
+
+For example:
+
+1 → 2 → 2 → 1
+
+is a palindrome.
+
+But:
+
+1 → 2 → 3
+
+is not.
+
+Step 1: Store linked-list values in an array
+arr = []
+
+while head:
+    arr.append(head.val)
+    head = head.next
+
+Suppose the linked list is:
+
+1 → 2 → 3 → 2 → 1
+
+After the loop:
+
+arr = [1, 2, 3, 2, 1]
+
+Now the problem becomes much easier because we can access elements from both ends.
+
+Step 2: Create two pointers
+left = 0
+right = len(arr) - 1
+
+Initially:
+
+[1, 2, 3, 2, 1]
+ ↑           ↑
+left       right
+
+left starts at the beginning and right starts at the end.
+
+Step 3: Compare both sides
+while left < right:
+    if arr[left] != arr[right]:
+        return False
+
+For our example:
+
+1 == 1  ✓
+2 == 2  ✓
+3 == 3  ✓
+
+If any pair is different, immediately return False.
+
+For example:
+
+[1, 2, 3, 4]
+ ↑        ↑
+
+1 != 4
+
+So:
+
+return False
+Step 4: Move both pointers toward the center
+left += 1
+right -= 1
+
+So:
+
+[1, 2, 3, 2, 1]
+ ↑           ↑
+left       right
+
+   ↓       ↓
+
+[1, 2, 3, 2, 1]
+    ↑     ↑
+
+      ↓ ↓
+
+[1, 2, 3, 2, 1]
+       ↑
+
+Once left >= right, we've checked all necessary pairs.
+
+Then:
+
+return True
+Overall flow
+Linked List
+    ↓
+1 → 2 → 3 → 2 → 1
+    ↓
+Convert to array
+    ↓
+[1, 2, 3, 2, 1]
+    ↓
+Compare first ↔ last
+    ↓
+Compare second ↔ second-last
+    ↓
+Continue toward center
+    ↓
+All equal?
+  /       \
+Yes       No
+ ↓         ↓
+True      False
+Complexity
+
+If n is the number of nodes:
+
+Time: O(n)
+Space: O(n) because we store all node values in arr.
+Interview explanation
+
+I traverse the linked list and store all its values in an array. Then I use two pointers, one starting from the beginning and one from the end, and compare the corresponding values. If any pair differs, I return false. If all pairs match, the linked list is a palindrome, so I return true.
+
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        output = [1] * len(nums)
+        
+        left = 1
+        for i in range(len(nums)):
+            output[i] *= left
+            left *= nums[i]
+        
+        right = 1
+        for i in range(len(nums) - 1, -1, -1):
+            output[i] *= right
+            right *= nums[i]
+    
+        return output        
+Approach: Prefix Product + Suffix Product
+
+The goal is to return an array where each position contains the product of every element except the element at that position.
+
+Example:
+
+nums = [1, 2, 3, 4]
+
+Output:
+
+[24, 12, 8, 6]
+
+Because:
+
+index 0 → 2 × 3 × 4 = 24
+index 1 → 1 × 3 × 4 = 12
+index 2 → 1 × 2 × 4 = 8
+index 3 → 1 × 2 × 3 = 6
+Step 1: Create the output array
+output = [1] * len(nums)
+
+For:
+
+nums = [1, 2, 3, 4]
+
+we start with:
+
+output = [1, 1, 1, 1]
+Step 2: Calculate products from the left
+left = 1
+
+for i in range(len(nums)):
+    output[i] *= left
+    left *= nums[i]
+
+Here, left stores the product of all elements before the current index.
+
+For:
+
+[1, 2, 3, 4]
+
+we get:
+
+i = 0 → left = 1
+i = 1 → left = 1
+i = 2 → left = 1 × 2 = 2
+i = 3 → left = 1 × 2 × 3 = 6
+
+So output becomes:
+
+[1, 1, 2, 6]
+
+This represents:
+
+[product on left of each element]
+Step 3: Calculate products from the right
+right = 1
+
+for i in range(len(nums) - 1, -1, -1):
+    output[i] *= right
+    right *= nums[i]
+
+Now right stores the product of all elements after the current index.
+
+Starting from the right:
+
+nums = [1, 2, 3, 4]
+
+We combine the right-side products with our existing left-side products.
+
+Eventually:
+
+output = [24, 12, 8, 6]
+The main idea
+
+For every index:
+
+answer[i] = product of elements on LEFT
+          × product of elements on RIGHT
+
+For example, for 3:
+
+[1, 2, 3, 4]
+       ↑
+
+Left:
+
+1 × 2 = 2
+
+Right:
+
+4
+
+Therefore:
+
+2 × 4 = 8
+Why two passes?
+
+Instead of calculating the product separately for every element—which would take O(n²)—we calculate:
+
+All left products in one pass.
+All right products in another pass.
+
+Therefore:
+
+Time: O(n)
+Extra space: O(1) excluding the required output array.
+Important advantage
+
+This solution also works correctly when there are zeros.
+
+For example:
+
+nums = [1, 2, 0, 4]
+
+Output:
+
+
+code:
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        output = [1] * len(nums)
+        
+        left = 1
+        for i in range(len(nums)):
+            output[i] *= left
+            left *= nums[i]
+        
+        right = 1
+        for i in range(len(nums) - 1, -1, -1):
+            output[i] *= right
+            right *= nums[i]
+    
+        return output        
+
+[0, 0, 8, 0]
+
+No division is needed.
