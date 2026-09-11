@@ -1,0 +1,122 @@
+Code:
+class Solution:
+    def removeNthFromEnd(self, head: Optional[ListNode], n: int) -> Optional[ListNode]:
+        res = ListNode(0, head)
+        dummy = res
+
+        for _ in range(n):
+            head = head.next
+        
+        while head:
+            head = head.next
+            dummy = dummy.next
+        
+        dummy.next = dummy.next.next
+
+        return res.next
+
+
+Approach: Two Pointers
+
+This solution uses the Two-Pointer technique with a dummy node.
+
+The problem asks us to remove the nth node from the end of a linked list.
+
+Example:
+
+1 → 2 → 3 → 4 → 5
+
+If n = 2, we need to remove 4:
+
+1 → 2 → 3 → 5
+Step 1: Create a dummy node
+res = ListNode(0, head)
+dummy = res
+
+We create:
+
+dummy → 1 → 2 → 3 → 4 → 5
+
+The dummy node makes it easier to handle cases where we need to remove the first node.
+
+Step 2: Move head forward by n
+for _ in range(n):
+    head = head.next
+
+If n = 2:
+
+dummy → 1 → 2 → 3 → 4 → 5
+                    ↑
+                  head
+
+The important thing is that head is now 2 nodes ahead of dummy.
+
+Step 3: Move both pointers together
+while head:
+    head = head.next
+    dummy = dummy.next
+
+Both pointers move at the same speed.
+
+Because head started n positions ahead, when head reaches the end, dummy will be positioned just before the node we want to remove.
+
+For:
+
+1 → 2 → 3 → 4 → 5
+n = 2
+
+dummy ends here:
+
+1 → 2 → 3 → 4 → 5
+        ↑
+      dummy
+
+The next node (dummy.next) is 4, which is the node we want to delete.
+
+Step 4: Remove the node
+dummy.next = dummy.next.next
+
+Before:
+
+3 → 4 → 5
+    ↑
+  remove
+
+After:
+
+3 → 5
+
+So the final list is:
+
+1 → 2 → 3 → 5
+Step 5: Return the actual head
+return res.next
+
+We return res.next instead of res because res is just the dummy node.
+
+The key idea
+
+Think of it like this:
+
+dummy                         head
+  ↓                             ↓
+  0 → 1 → 2 → 3 → 4 → 5 → None
+       ←──── n positions ────→
+
+Keep the two pointers n nodes apart.
+
+When the front pointer reaches the end:
+
+dummy
+  ↓
+  0 → 1 → 2 → 3 → 4 → 5 → None
+              ↑
+            dummy
+                            ↑
+                           head
+
+dummy.next is the node that needs to be removed.
+
+Complexity
+Time: O(L) where L is the length of the linked list
+Space: O(1)
