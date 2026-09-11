@@ -1,0 +1,89 @@
+Approach: Horizontal Scanning
+
+The idea is to take the first string as the initial prefix and compare it with every other string.
+
+Example:
+
+strs = ["flower", "flow", "flight"]
+
+We want:
+
+"fl"
+Step 1: Take the first string as the prefix
+pref = strs[0]
+pref_len = len(pref)
+
+Initially:
+
+pref = "flower"
+
+We assume "flower" is the common prefix.
+
+Step 2: Compare it with every other string
+for s in strs[1:]:
+
+First:
+
+"flower" vs "flow"
+
+They don't match, so reduce the prefix:
+
+"flower" → "flow"
+
+Now they match.
+
+Step 3: Compare the reduced prefix with the next string
+
+Now:
+
+"flow" vs "flight"
+
+They don't completely match.
+
+Keep reducing:
+
+"flow" → "flo"   
+"flo"  → "fl"    
+
+So the prefix becomes:
+
+"fl"
+Step 4: Return the prefix
+return pref
+
+Answer:
+
+"fl"
+Why do we use s[0:pref_len]?
+
+It takes the first pref_len characters from the current string.
+
+For example:
+
+s = "flight"
+
+s[0:4]  # "flig"
+s[0:2]  # "fl"
+
+So this condition:
+
+while pref != s[0:pref_len]:
+
+Time Complexity: O(n × m)
+Space Complexity: O(1) apart from the input strings
+
+Code:
+class Solution:
+    def longestCommonPrefix(self, strs: List[str]) -> str:
+        pref = strs[0]
+        pref_len = len(pref)
+
+        for s in strs[1:]:
+            while pref != s[0:pref_len]:
+                pref_len -= 1
+                if pref_len == 0:
+                    return ""
+                
+                pref = pref[0:pref_len]
+        
+        return pref
