@@ -1,0 +1,213 @@
+Code:
+class MyQueue(object):
+    def __init__(self):
+        self.in_stk = []
+        self.out_stk = []
+    def push(self, x):
+        self.in_stk.append(x)
+    def pop(self):
+        self.peek()
+        return self.out_stk.pop()
+    def peek(self):
+        if not self.out_stk:
+            while self.in_stk:
+                self.out_stk.append(self.in_stk.pop())
+        return self.out_stk[-1]
+    def empty(self):
+        return not self.in_stk and not self.out_stk
+
+
+Approach: Implement Queue Using Two Stacks
+
+A Queue follows FIFO:
+
+First In, First Out
+
+A Stack follows LIFO:
+
+Last In, First Out
+
+So the challenge is to use two stacks to make a stack behave like a queue.
+
+Your two stacks are:
+
+self.in_stk = []
+self.out_stk = []
+
+Think of them as:
+
+in_stk → where new elements enter
+out_stk → where elements leave
+1. push(x)
+def push(self, x):
+    self.in_stk.append(x)
+
+Simply add the element to in_stk.
+
+For:
+
+push(1)
+push(2)
+push(3)
+
+we get:
+
+in_stk = [1, 2, 3]
+out_stk = []
+2. peek()
+
+This is the most important part.
+
+def peek(self):
+    if not self.out_stk:
+        while self.in_stk:
+            self.out_stk.append(self.in_stk.pop())
+
+    return self.out_stk[-1]
+
+Suppose:
+
+in_stk = [1, 2, 3]
+out_stk = []
+
+We transfer everything from in_stk to out_stk:
+
+in_stk = []
+out_stk = [3, 2, 1]
+
+Because stacks are LIFO, the order gets reversed.
+
+Now:
+
+out_stk[-1] = 1
+
+So 1 is at the front, exactly like a queue.
+
+Queue order:
+1 → 2 → 3
+↑
+front
+3. pop()
+def pop(self):
+    self.peek()
+    return self.out_stk.pop()
+
+First:
+
+self.peek()
+
+makes sure out_stk has elements in the correct order.
+
+Then:
+
+self.out_stk.pop()
+
+removes the front element.
+
+Example:
+
+out_stk = [3, 2, 1]
+
+pop() removes:
+
+1
+
+Leaving:
+
+out_stk = [3, 2]
+4. Why don't we transfer every time?
+
+This is an important optimization.
+
+Suppose:
+
+in_stk = [4, 5]
+out_stk = [3, 2, 1]
+
+If we call pop(), we don't move 4,5 yet.
+
+We simply pop from:
+
+out_stk
+
+So:
+
+1 → removed
+2 → next
+3 → next
+
+Only when out_stk becomes empty do we transfer the elements from in_stk.
+
+This gives the solution amortized O(1) time per operation.
+
+5. empty()
+def empty(self):
+    return not self.in_stk and not self.out_stk
+
+The queue is empty only when both stacks are empty.
+
+For example:
+
+in_stk  = []
+out_stk = []
+
+returns:
+
+True
+
+But:
+
+in_stk  = [5]
+out_stk = []
+
+returns:
+
+False
+Overall example
+push(1)
+push(2)
+push(3)
+
+Initially:
+
+in_stk  = [1, 2, 3]
+out_stk = []
+
+Call:
+
+peek()
+
+Transfer:
+
+in_stk  = []
+out_stk = [3, 2, 1]
+
+Front:
+
+1
+
+Call:
+
+pop()
+
+Result:
+
+1
+
+Now:
+
+out_stk = [3, 2]
+
+Next pop():
+
+2
+
+Next:
+
+3
+
+So we successfully achieved:
+
+Queue: 1 → 2 → 3
+       ↑
+     First Out
